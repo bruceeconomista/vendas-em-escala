@@ -176,14 +176,27 @@ export default function Home() {
   };
 
   // Função para desenhar o caminho SVG
-type NodeId = keyof typeof nodePositions;
-const getPathD = (startId: string, endId: string) => {
+type NodeKey = keyof typeof nodePositions;
+
+const getPathD = (startId: NodeKey, endId: NodeKey) => {
   const startNode = nodePositions[startId];
   const endNode = nodePositions[endId];
 
   if (!startNode || !endNode) return "";
 
-  let startPoint, endPoint;
+  const startPoint = startId === 'ai'
+  ? getCircleConnectionPoint(
+      { cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius },
+      endRect
+    )
+  : getRectConnectionPoint(startRect, endRect);
+
+const endPoint = endId === 'ai'
+  ? getCircleConnectionPoint(
+      { cx: endNode.cx, cy: endNode.cy, radius: nodeDimensions.ai.radius },
+      startRect
+    )
+  : getRectConnectionPoint(endRect, startRect);
 
   const startRect: PointRect = 
     startId === 'ai'
