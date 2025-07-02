@@ -176,70 +176,43 @@ export default function Home() {
   };
 
   // Função para desenhar o caminho SVG
-  type NodeId = keyof typeof nodePositions;
-  const getPathD = (startId: NodeId, endId: NodeId) => {
-    const startNode = nodePositions?.[startId];
-    const endNode = nodePositions?.[endId];
+type NodeId = keyof typeof nodePositions;
+const getPathD = (startId: string, endId: string) => {
+  const startNode = nodePositions[startId];
+  const endNode = nodePositions[endId];
 
-    if (!startNode || !endNode) return "";
+  if (!startNode || !endNode) return "";
 
-    let startPoint, endPoint;
+  let startPoint, endPoint;
 
-    // Calcular ponto de partida na borda do nó inicial
-  if (startId === 'ai') {
-    startPoint = getCircleConnectionPoint(
-      { cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius },
-      { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height } // <-- Aqui é o ponto alvo
-    );
-} else {
-  startPoint = getRectConnectionPoint(
-    { cx: startNode.cx, cy: startNode.cy, width: nodeDimensions.input.width, height: nodeDimensions.input.height },
-    { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height }
-  );
-}
+  const startRect: PointRect = 
+    startId === 'ai'
+      ? { cx: startNode.cx, cy: startNode.cy, width: 0, height: 0 } // Placeholder, não usado no cálculo
+      : { cx: startNode.cx, cy: startNode.cy, width: nodeDimensions.input.width, height: nodeDimensions.input.height };
 
-    // Calcular ponto de chegada na borda do nó final
-    if (endId === 'ai') {
-      endPoint = getCircleConnectionPoint(
-        { cx: endNode.cx, cy: endNode.cy, radius: nodeDimensions.ai.radius },
-        startNode
-      );
-    } else { // Nó de saída (retângulo)
-      endPoint = getRectConnectionPoint(
-        { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height },
-        startNode
-      );
-    }
+  const endRect: PointRect = 
+    endId === 'ai'
+      ? { cx: endNode.cx, cy: endNode.cy, width: 0, height: 0 } // Placeholder, também só cx/cy são usados no cálculo
+      : { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height };
 
-    let cp1x, cp1y, cp2x, cp2y;
+  // Calcular ponto de partida
+  startPoint = startId === 'ai'
+    ? getCircleConnectionPoint({ cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius }, endRect)
+    : getRectConnectionPoint(startRect, endRect);
 
-    // Se a linha vai da IA para os nós de saída (abaixo)
-    if (startId === 'ai' && (endId === 'geolocalizacao' || endId === 'excel')) {
-        // Para uma curva mais "para baixo" da IA e depois abre para o nó de saída
-        cp1x = startPoint.x;
-        cp1y = startPoint.y + (endPoint.y - startPoint.y) * 0.3; // Ponto de controle 1: sai da IA para baixo
+  // Calcular ponto de chegada
+  endPoint = endId === 'ai'
+    ? getCircleConnectionPoint({ cx: endNode.cx, cy: endNode.cy, radius: nodeDimensions.ai.radius }, startRect)
+    : getRectConnectionPoint(endRect, startRect);
 
-        cp2x = endPoint.x;
-        cp2y = endPoint.y - (endPoint.y - startPoint.y) * 0.3; // Ponto de controle 2: entra no nó de baixo para cima
-    }
-    // Se a linha vai dos nós de entrada para a IA
-    else if (endId === 'ai') {
-        cp1x = startPoint.x + (endPoint.x - startPoint.x) * 0.3; // Ajuste horizontal para as curvas
-        cp1y = startPoint.y;
+  // Cálculo dos pontos de controle da curva
+  const cp1x = startPoint.x + (endPoint.x - startPoint.x) * 0.3;
+  const cp1y = startPoint.y;
+  const cp2x = endPoint.x - (endPoint.x - startPoint.x) * 0.3;
+  const cp2y = endPoint.y;
 
-        cp2x = endPoint.x - (endPoint.x - startPoint.x) * 0.3; // Ajuste horizontal para as curvas
-        cp2y = endPoint.y;
-    }
-    // Caso geral ou fallback
-    else {
-        cp1x = startPoint.x + (endPoint.x - startPoint.x) * 0.3;
-        cp1y = startPoint.y;
-        cp2x = endPoint.x - (endPoint.x - startPoint.x) * 0.3;
-        cp2y = endPoint.y;
-    }
-
-    return `M${startPoint.x},${startPoint.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${endPoint.x},${endPoint.y}`;
-  };
+  return `M${startPoint.x},${startPoint.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${endPoint.x},${endPoint.y}`;
+};
 
 
   return (
