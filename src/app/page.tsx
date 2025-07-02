@@ -7,6 +7,7 @@ import { MapPin, FileSpreadsheet, Ampersand, CastleIcon, FileUser, LucideChartNo
 export default function Home() {
   const [buttonText, setButtonText] = useState('Comece agora');
   const [buttonBg, setButtonBg] = useState('bg-indigo-500');
+  const [isClient, setIsClient] = useState(false); // NOVO ESTADO PARA CONTROLE DA HIDRATAÇÃO
 
   // Textos para a animação do título
   const titleParts = [
@@ -19,20 +20,22 @@ export default function Home() {
   // Efeitos para as partes do título
   const titleVariants = {
     hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
   };
 
   // Efeitos para o botão
   const buttonVariants = {
     initial: { scale: 0.8, opacity: 0 },
     animate: { scale: 1, opacity: 1, transition: { duration: 0.5 } },
-    hover: { scale: 1.05, backgroundColor: 'var(--hover-bg)' },
+    hover: { scale: 1.05, backgroundColor: 'var(--hover-bg)' }, // Este será ajustado no style prop
   };
 
   // Estado para controlar a animação dos caminhos SVG
   const [pathsAnimated, setPathsAnimated] = useState(false);
 
   useEffect(() => {
+    setIsClient(true); // Define isClient como true APÓS a hidratação no cliente
+
     const buttonInterval = setInterval(() => {
       setButtonText((prev) =>
         prev === 'Comece agora' ? 'Transforme suas vendas!' : 'Comece agora'
@@ -60,18 +63,18 @@ export default function Home() {
     { id: 'economicos', label: 'Porte da Empresa', icon: LucideChartNoAxesCombined },
     { id: 'comerciais', label: 'Região de Atuação', icon: MapPin },
     { id: 'consumo', label: 'Dados dos Sócios', icon: FileUser },
-  ];
+  ] as const;
 
   const outputNodes = [
     { id: 'geolocalizacao', label: 'Mapas de Oportunidades', icon: MapPin, description: 'Descubra novas áreas de atuação' },
     { id: 'excel', label: 'Exportação para Excel', icon: FileSpreadsheet, description: 'Baixe seus dados em segundos' },
-  ];
+  ] as const;
 
   // Definindo as dimensões fixas (ajuste esses valores conforme o CSS real dos seus elementos)
   const nodeDimensions = {
     input: { width: 200, height: 40 },
     ai: { width: 100, height: 100, radius: 50 },
-    output: { width: 350, height: 150 }, // Dimensões dos novos containers maiores
+    output: { width: 350, height: 150 },
   };
 
   // As posições agora são relativas ao contêiner do diagrama (viewBox 1000x500)
@@ -91,17 +94,16 @@ export default function Home() {
     // Ajuste estes valores de cx e cy para posicionar os containers no lugar certo
     geolocalizacao: { cx: 500 - 200, cy: 420 }, // Exemplo: 150px à esquerda do centro, em y=400
     excel:          { cx: 500 + 200, cy: 420 }, // Exemplo: 150px à direita do centro, em y=400
-  };
+  } as const;
 
   // Função para calcular o ponto de conexão na borda de um retângulo
-  
   type PointRect = {
-  cx: number;
-  cy: number;
-  width: number;
-  height: number;
+    cx: number;
+    cy: number;
+    width: number;
+    height: number;
   };
-  
+
   const getRectConnectionPoint = (rect: PointRect, targetPoint: PointRect) => {
     const { cx, cy, width, height } = rect;
     const dx = targetPoint.cx - cx;
@@ -156,13 +158,12 @@ export default function Home() {
   };
 
   // Função para calcular o ponto de conexão na borda de um círculo
-  
   type Circle = {
-  cx: number;
-  cy: number;
-  radius: number;
+    cx: number;
+    cy: number;
+    radius: number;
   };
-  
+
   const getCircleConnectionPoint = (circle: Circle, targetPoint: PointRect) => {
     const { cx, cy, radius } = circle;
     const dx = targetPoint.cx - cx;
@@ -176,56 +177,43 @@ export default function Home() {
   };
 
   // Função para desenhar o caminho SVG
-type NodeKey = keyof typeof nodePositions;
+  type NodeId = keyof typeof nodePositions;
+  const getPathD = (startId: NodeId, endId: NodeId) => {
+    const startNode = nodePositions[startId];
+    const endNode = nodePositions[endId];
 
-const getPathD = (startId: NodeKey, endId: NodeKey) => {
-  const startNode = nodePositions[startId];
-  const endNode = nodePositions[endId];
+    if (!startNode || !endNode) return "";
 
-  if (!startNode || !endNode) return "";
+    let startPoint, endPoint;
 
-  const startPoint = startId === 'ai'
-  ? getCircleConnectionPoint(
-      { cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius },
-      endRect
-    )
-  : getRectConnectionPoint(startRect, endRect);
+    const startRect: PointRect =
+      startId === 'ai'
+        ? { cx: startNode.cx, cy: startNode.cy, width: 0, height: 0 } // Placeholder, não usado no cálculo
+        : { cx: startNode.cx, cy: startNode.cy, width: nodeDimensions.input.width, height: nodeDimensions.input.height };
 
-const endPoint = endId === 'ai'
-  ? getCircleConnectionPoint(
-      { cx: endNode.cx, cy: endNode.cy, radius: nodeDimensions.ai.radius },
-      startRect
-    )
-  : getRectConnectionPoint(endRect, startRect);
+    const endRect: PointRect =
+      endId === 'ai'
+        ? { cx: endNode.cx, cy: endNode.cy, width: 0, height: 0 } // Placeholder, também só cx/cy são usados no cálculo
+        : { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height };
 
-  const startRect: PointRect = 
-    startId === 'ai'
-      ? { cx: startNode.cx, cy: startNode.cy, width: 0, height: 0 } // Placeholder, não usado no cálculo
-      : { cx: startNode.cx, cy: startNode.cy, width: nodeDimensions.input.width, height: nodeDimensions.input.height };
+    // Calcular ponto de partida
+    startPoint = startId === 'ai'
+      ? getCircleConnectionPoint({ cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius }, endRect)
+      : getRectConnectionPoint(startRect, endRect);
 
-  const endRect: PointRect = 
-    endId === 'ai'
-      ? { cx: endNode.cx, cy: endNode.cy, width: 0, height: 0 } // Placeholder, também só cx/cy são usados no cálculo
-      : { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height };
+    // Calcular ponto de chegada
+    endPoint = endId === 'ai'
+      ? getCircleConnectionPoint({ cx: endNode.cx, cy: endNode.cy, radius: nodeDimensions.ai.radius }, startRect)
+      : getRectConnectionPoint(endRect, startRect);
 
-  // Calcular ponto de partida
-  startPoint = startId === 'ai'
-    ? getCircleConnectionPoint({ cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius }, endRect)
-    : getRectConnectionPoint(startRect, endRect);
+    // Cálculo dos pontos de controle da curva
+    const cp1x = startPoint.x + (endPoint.x - startPoint.x) * 0.3;
+    const cp1y = startPoint.y;
+    const cp2x = endPoint.x - (endPoint.x - startPoint.x) * 0.3;
+    const cp2y = endPoint.y;
 
-  // Calcular ponto de chegada
-  endPoint = endId === 'ai'
-    ? getCircleConnectionPoint({ cx: endNode.cx, cy: endNode.cy, radius: nodeDimensions.ai.radius }, startRect)
-    : getRectConnectionPoint(endRect, startRect);
-
-  // Cálculo dos pontos de controle da curva
-  const cp1x = startPoint.x + (endPoint.x - startPoint.x) * 0.3;
-  const cp1y = startPoint.y;
-  const cp2x = endPoint.x - (endPoint.x - startPoint.x) * 0.3;
-  const cp2y = endPoint.y;
-
-  return `M${startPoint.x},${startPoint.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${endPoint.x},${endPoint.y}`;
-};
+    return `M${startPoint.x},${startPoint.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${endPoint.x},${endPoint.y}`;
+  };
 
 
   return (
@@ -243,7 +231,7 @@ const endPoint = endId === 'ai'
 
       {/* Hero Section */}
       <section
-        className="flex flex-col items-center justify-center flex-grow py-10 px-6 overflow-hidden relative mb-[-150px]" // <-- ADICIONADO AQUI
+        className="flex flex-col items-center justify-center flex-grow py-10 px-6 overflow-hidden relative mb-[-150px]"
         style={{
           // Você pode adicionar a imagem de fundo aqui, como discutido anteriormente:
           // backgroundImage: 'url("/images/seu-background-aqui.jpg")',
@@ -280,17 +268,27 @@ const endPoint = endId === 'ai'
         </motion.p>
 
         {/* Botão */}
-        <motion.button
-          className={`${buttonBg} text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg transition-all duration-500 ease-in-out mb-20 z-10`}
-          variants={buttonVariants}
-          initial="initial"
-          animate="animate"
-          whileHover="hover"
-          transition={{ delay: 2, duration: 0.5 }}
-          style={{ '--hover-bg': buttonBg === 'bg-indigo-500' ? '#4f46e5' : '#8B5CF6' }}
-        >
-          {buttonText} <span className="ml-2">→</span>
-        </motion.button>
+        {isClient && ( // Renderiza o botão SOMENTE no cliente após a hidratação
+          <motion.button
+            className={`${buttonBg} text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg transition-all duration-500 ease-in-out mb-20 z-10`}
+            variants={buttonVariants}
+            initial="initial"
+            animate="animate"
+            whileHover="hover"
+            transition={{ delay: 2, duration: 0.5 }}
+            style={{
+              backgroundColor: buttonBg === 'bg-indigo-500' ? '#6366F1' : '#8B5CF6',
+            }}
+          >
+            {buttonText} <span className="ml-2">→</span>
+          </motion.button>
+        )}
+        {!isClient && ( // Renderiza um placeholder simples no servidor
+          <button className="bg-indigo-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg mb-20 z-10">
+            Comece agora <span className="ml-2">→</span>
+          </button>
+        )}
+
 
         {/* Contêiner para o Diagrama de Rede (abaixo do botão) */}
         <div className="relative w-full max-w-[1000px] h-[500px] mx-auto mt-[-50px] pointer-events-none">
@@ -429,6 +427,25 @@ const endPoint = endId === 'ai'
           </motion.div>
 
           {/* NOVOS NÓS DE SAÍDA COM POSICIONAMENTO SIMPLIFICADO */}
+          {inputNodes.map((node, index) => ( // Erro: Estava mapeando inputNodes em vez de outputNodes
+            <motion.div
+              key={node.id}
+              className={`absolute p-3 rounded-xl shadow-lg bg-gray-700 text-white flex items-center gap-2 text-sm whitespace-nowrap opacity-0`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 2.5 + (index * 0.1), duration: 0.5 }}
+              style={{
+                width: nodeDimensions.input.width,
+                height: nodeDimensions.input.height,
+                top: nodePositions[node.id].cy - nodeDimensions.input.height / 2,
+                left: nodePositions[node.id].cx - nodeDimensions.input.width / 2,
+              }}
+            >
+              <node.icon className="w-4 h-4" />
+              {node.label} +
+            </motion.div>
+          ))}
+          {/* NOVOS NÓS DE SAÍDA COM POSICIONAMENTO SIMPLIFICADO */}
           {outputNodes.map((node, index) => (
             <motion.div
               key={node.id}
@@ -453,8 +470,8 @@ const endPoint = endId === 'ai'
       </section>
 
       {/* As seções seguintes permanecem iguais */}
-<section id="vantagens" className="bg-slate-800 py-40 px-8"> {/* Reduzido py-60 para py-40 */}
-        <h3 className="text-4xl font-bold text-center mb-32 text-white">Multiplique sua Carteira de Clientes!</h3> {/* Novo título */}
+      <section id="vantagens" className="bg-slate-800 py-40 px-8">
+        <h3 className="text-4xl font-bold text-center mb-32 text-white">Multiplique sua Carteira de Clientes!</h3>
 
         <div className="max-w-7xl mx-auto flex flex-col items-center justify-center gap-12">
           {/* Gráfico de Crescimento Central (SVG) */}
