@@ -176,7 +176,7 @@ export default function Home() {
   };
 
   // Função para desenhar o caminho SVG
-  const getPathD = (startId, endId) => {
+  const getPathD = (startId: string, endId: string) => {
     const startNode = nodePositions?.[startId];
     const endNode = nodePositions?.[endId];
 
