@@ -156,7 +156,14 @@ export default function Home() {
   };
 
   // Função para calcular o ponto de conexão na borda de um círculo
-  const getCircleConnectionPoint = (circle, targetPoint) => {
+  
+  type Circle = {
+  cx: number;
+  cy: number;
+  radius: number;
+  };
+  
+  const getCircleConnectionPoint = (circle: Circle, targetPoint: PointRect) => {
     const { cx, cy, radius } = circle;
     const dx = targetPoint.cx - cx;
     const dy = targetPoint.cy - cy;
