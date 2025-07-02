@@ -186,17 +186,17 @@ export default function Home() {
     let startPoint, endPoint;
 
     // Calcular ponto de partida na borda do nó inicial
-    if (startId === 'ai') {
-      startPoint = getCircleConnectionPoint(
-        { cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius },
-        endNode
-      );
-    } else { // Nó de entrada (retângulo)
-      startPoint = getRectConnectionPoint(
-        { cx: startNode.cx, cy: startNode.cy, width: nodeDimensions.input.width, height: nodeDimensions.input.height },
-        endNode
-      );
-    }
+  if (startId === 'ai') {
+    startPoint = getCircleConnectionPoint(
+      { cx: startNode.cx, cy: startNode.cy, radius: nodeDimensions.ai.radius },
+      { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height } // <-- Aqui é o ponto alvo
+    );
+} else {
+  startPoint = getRectConnectionPoint(
+    { cx: startNode.cx, cy: startNode.cy, width: nodeDimensions.input.width, height: nodeDimensions.input.height },
+    { cx: endNode.cx, cy: endNode.cy, width: nodeDimensions.output.width, height: nodeDimensions.output.height }
+  );
+}
 
     // Calcular ponto de chegada na borda do nó final
     if (endId === 'ai') {
