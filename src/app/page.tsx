@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { MapPin, FileSpreadsheet, Ampersand, UserRoundSearch, CastleIcon, Database, FileUser, LucideChartNoAxesCombined, TrendingUp, DollarSign } from 'lucide-react';
+import { MapPin, FileSpreadsheet, Ampersand, CastleIcon, FileUser, LucideChartNoAxesCombined, DollarSign } from 'lucide-react';
 
 export default function Home() {
   const [buttonText, setButtonText] = useState('Comece agora');
