@@ -94,7 +94,15 @@ export default function Home() {
   };
 
   // Função para calcular o ponto de conexão na borda de um retângulo
-  const getRectConnectionPoint = (rect, targetPoint) => {
+  
+  type PointRect = {
+  cx: number;
+  cy: number;
+  width: number;
+  height: number;
+  };
+  
+  const getRectConnectionPoint = (rect: PointRect, targetPoint: PointRect) => {
     const { cx, cy, width, height } = rect;
     const dx = targetPoint.cx - cx;
     const dy = targetPoint.cy - cy;
