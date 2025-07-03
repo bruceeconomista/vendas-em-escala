@@ -176,6 +176,7 @@ export default function Home() {
   };
 
   // Função para desenhar o caminho SVG
+
 type NodeId = keyof typeof nodePositions; // Correctly define NodeId
 const getPathD = (startId: NodeId, endId: NodeId) => { // Use NodeId for parameters
   const startNode = nodePositions[startId];
