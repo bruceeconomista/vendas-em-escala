@@ -1,0 +1,283 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tb_usuarios {
+  id         Int       @id @default(autoincrement())
+  cnpj       String    @unique @db.VarChar(18)
+  email      String    @unique @db.VarChar(100)
+  telefone   String?   @db.VarChar(20)
+  senha_hash String
+  criado_em  DateTime? @default(now()) @db.Timestamp(6)
+
+  @@map("tb_usuarios")
+}
+
+model visao_empresa_agrupada_base {
+  cnpj                        String    @id @unique(map: "idx_cnpj_unico") @map("cnpj")
+  razao_social                String?
+  nome_fantasia               String?
+  identificador_matriz_filial String?
+  data_inicio_atividade       DateTime? @db.Date
+  capital_social              Decimal?  @db.Decimal
+  cod_cnae_principal          String?
+  cnae_principal              String?
+  cod_cnae_secundario         String?
+  cnae_secundario             String?
+  porte_empresa               String?
+  natureza_juridica           String?
+  opcao_simples               String?
+  opcao_mei                   String?
+  motivo                      String?
+  situacao_cadastral          String?
+  data_situacao_cadastral     DateTime? @db.Date
+  uf                          String?
+  municipio                   String?
+  bairro                      String?
+  logradouro                  String?
+  numero                      String?
+  complemento                 String?
+  cep                         String?
+  latitude                    Decimal?  @db.Decimal
+  longitude                   Decimal?  @db.Decimal
+  ddd1                        String?
+  telefone1                   String?
+  ddd2                        String?
+  telefone2                   String?
+  email                       String?
+  qtde_socios                 Decimal?  @db.Decimal
+  nomes_socios                String?
+  cpfs_socios                 String?
+  datas_entrada               String?
+  qualificacoes               String?
+  faixas_etarias              String?
+  razao_social_normalizado    String?
+  nome_fantasia_normalizado   String?
+  uf_normalizado              String?
+  municipio_normalizado       String?
+  bairro_normalizado          String?
+  cnae_principal_normalizado  String?
+  cnae_secundario_normalizado String?
+
+  @@index([bairro_normalizado(ops: raw("gin_trgm_ops"))], map: "idx_bairro_norm", type: Gin)
+  @@index([capital_social], map: "idx_capital_social")
+  @@index([cnae_principal_normalizado(ops: raw("gin_trgm_ops"))], map: "idx_cnae_principal_norm", type: Gin)
+  @@index([cnae_secundario_normalizado(ops: raw("gin_trgm_ops"))], map: "idx_cnae_secundario_norm", type: Gin)
+  @@index([cod_cnae_principal], map: "idx_cod_cnae_principal")
+  @@index([cod_cnae_secundario], map: "idx_cod_cnae_secundario")
+  @@index([data_inicio_atividade], map: "idx_data_inicio_atividade")
+  @@index([data_situacao_cadastral], map: "idx_data_situacao_cadastral")
+  @@index([municipio_normalizado(ops: raw("gin_trgm_ops"))], map: "idx_municipio_norm", type: Gin)
+  @@index([nome_fantasia_normalizado(ops: raw("gin_trgm_ops"))], map: "idx_nf_norm", type: Gin)
+  @@index([razao_social_normalizado(ops: raw("gin_trgm_ops"))], map: "idx_rs_norm", type: Gin)
+  @@index([qtde_socios], map: "idx_socios")
+  @@index([uf_normalizado(ops: raw("gin_trgm_ops"))], map: "idx_uf_norm", type: Gin)
+  @@map("visao_empresa_agrupada_base")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model staging_empresas {
+  cnpj_basico              String?
+  razao_social             String?
+  cod_natureza_juridica    String?
+  qualificacao_responsavel String?
+  capital_social           String?
+  porte_empresa            String?
+  ente_federativo          String?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tb_cep {
+  cep             String?
+  uf              String?
+  municipio       String?
+  latitude        Decimal? @db.Decimal
+  longitude       Decimal? @db.Decimal
+  bairro          String?
+  logradouro      String?
+  numero          String?
+  complemento     String?
+  tipo_logradouro String?
+
+  @@ignore
+}
+
+model tb_cnae {
+  cod_cnae  String  @id
+  descricao String?
+
+  @@index([cod_cnae], map: "idx_cnae")
+}
+
+model tb_empresas {
+  cnpj_basico              String   @id
+  razao_social             String?
+  cod_natureza_juridica    String?
+  qualificacao_responsavel String?
+  capital_social           Decimal? @db.Decimal
+  porte_empresa            String?
+  ente_federativo          String?
+
+  @@index([cnpj_basico], map: "idx_empresas_cnpj")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tb_estabelecimentos {
+  cnpj_basico                 String?
+  cnpj_ordem                  String?
+  cnpj_dv                     String?
+  identificador_matriz_filial String?
+  nome_fantasia               String?
+  situacao_cadastral          String?
+  data_situacao_cadastral     DateTime? @db.Date
+  motivo_situacao_cadastral   String?
+  nome_cidade_exterior        String?
+  cod_pais                    String?
+  data_inicio_atividade       DateTime? @db.Date
+  cnae_fiscal_principal       String?
+  cnae_fiscal_secundaria      String?
+  tipo_logradouro             String?
+  logradouro                  String?
+  numero                      String?
+  complemento                 String?
+  bairro                      String?
+  cep                         String?
+  uf                          String?
+  cod_municipio               String?
+  ddd1                        String?
+  telefone1                   String?
+  ddd2                        String?
+  telefone2                   String?
+  ddd_fax                     String?
+  fax                         String?
+  email                       String?
+  situacao_especial           String?
+  data_situacao_especial      String?
+  cnpj_formatado              String?   @default(dbgenerated("((((((((\"substring\"(cnpj_basico, 1, 2) || '.'::text) || \"substring\"(cnpj_basico, 3, 3)) || '.'::text) || \"substring\"(cnpj_basico, 6, 3)) || '/'::text) || lpad(cnpj_ordem, 4, '0'::text)) || '-'::text) || lpad(cnpj_dv, 2, '0'::text))"))
+
+  @@index([cnpj_formatado], map: "idx_cnpj_formatado")
+  @@index([cnpj_basico, identificador_matriz_filial], map: "idx_estab_cnpj_matriz")
+  @@ignore
+}
+
+model tb_etaria {
+  cod_etaria String  @id
+  descricao  String?
+}
+
+model tb_leads_gerados {
+  cnpj                        String?
+  razao_social                String?
+  nome_fantasia               String?
+  identificador_matriz_filial String?
+  data_inicio_atividade       String?
+  capital_social              Float?
+  cod_cnae_principal          String?
+  cnae_principal              String?
+  cod_cnae_secundario         String?
+  cnae_secundario             String?
+  porte_empresa               String?
+  natureza_juridica           String?
+  opcao_simples               String?
+  opcao_mei                   String?
+  motivo                      String?
+  situacao_cadastral          String?
+  data_situacao_cadastral     String?
+  uf                          String?
+  municipio                   String?
+  bairro                      String?
+  logradouro                  String?
+  numero                      String?
+  complemento                 String?
+  cep                         String?
+  latitude                    String?
+  longitude                   String?
+  ddd1                        String?
+  telefone1                   String?
+  ddd2                        String?
+  telefone2                   String?
+  email                       String?
+  qtde_socios                 String?
+  nomes_socios                String?
+  cpfs_socios                 String?
+  datas_entrada               String?
+  qualificacoes               String?
+  faixas_etarias              String?
+  pontuacao                   BigInt?
+  data_geracao                DateTime? @db.Timestamp(6)
+  cliente_referencia          String?
+  id                          Int       @id @default(autoincrement())
+}
+
+model tb_motivos {
+  cod_motivo String  @id
+  descricao  String?
+}
+
+model tb_municipio {
+  cod_municipio String  @id
+  descricao     String?
+}
+
+model tb_natureza_juridica {
+  cod_natureza_juridica String  @id
+  descricao             String?
+}
+
+model tb_pais {
+  cod_pais  String  @id
+  descricao String?
+}
+
+model tb_porte_empresa {
+  cod_porte String  @id
+  descricao String?
+}
+
+model tb_qualificacao {
+  cod_qualificacao String  @id
+  descricao        String?
+}
+
+model tb_simples {
+  cnpj_basico           String  @id
+  opcao_simples         String?
+  data_opcao_simples    String?
+  data_exclusao_simples String?
+  opcao_mei             String?
+  data_opcao_mei        String?
+  data_exclusao_mei     String?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tb_situacao_cadastral {
+  cod_situacao_cadastral String?
+  descricao              String?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tb_socios {
+  cnpj_basico                    String?
+  identificador_socio            String?
+  nome_socio_razao_social        String?
+  cpf_cnpj_socio                 String?
+  cod_qualificacao_socio         String?
+  data_entrada_sociedade         DateTime? @db.Date
+  cod_pais                       String?
+  cpf_representante              String?
+  nome_representante             String?
+  cod_qualificacao_representante String?
+  faixa_etaria                   String?
+
+  @@index([cnpj_basico], map: "idx_socios_cnpj")
+  @@ignore
+}

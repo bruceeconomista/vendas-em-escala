@@ -1,0 +1,11 @@
+/src
+  ├── app
+  │   ├── page.tsx             ← landing
+  │   ├── login/page.tsx       ← login
+  │   ├── dashboard/page.tsx   ← protegido
+  │   └── perfil/page.tsx      ← perfil
+  └── lib
+      ├── auth.ts              ← funções de autenticação
+      ├── authOptions.ts       ← config do NextAuth
+      ├── routes.ts            ← rotas nomeadas
+      └── prisma.ts            ← instância do Prisma

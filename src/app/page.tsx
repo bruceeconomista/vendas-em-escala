@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { MapPin, FileSpreadsheet, Ampersand, CastleIcon, FileUser, LucideChartNoAxesCombined, DollarSign } from 'lucide-react';
+import Link from 'next/link'
 
 export default function Home() {
   const [buttonText, setButtonText] = useState('Comece agora');
@@ -225,7 +226,13 @@ const getPathD = (startId: NodeId, endId: NodeId) => { // Use NodeId for paramet
           <li><a href="#vantagens" className="hover:text-indigo-300">Vantagens</a></li>
           <li><a href="#beneficios" className="hover:text-indigo-300">Benefícios</a></li>
           <li><a href="#diferenciais" className="hover:text-indigo-300">Diferenciais</a></li>
-          <li><button className="bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-500">Login</button></li>
+            <li>
+              <Link href="/login"> {/* Use o componente Link aqui */}
+                <button className="bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-500">
+                  Login
+                </button>
+              </Link>
+            </li>
         </ul>
       </nav>
 
@@ -526,9 +533,12 @@ const getPathD = (startId: NodeId, endId: NodeId) => { // Use NodeId for paramet
       <section className="bg-slate-800 py-20 px-8 text-center">
         <h4 className="text-3xl font-bold mb-4">Pronto para aumentar suas vendas?</h4>
         <p className="text-slate-300 mb-6">Crie sua conta agora mesmo e comece a gerar leads qualificados.</p>
-        <button className="bg-indigo-500 hover:bg-indigo-400 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg transition">
-          Criar Conta
-        </button>
+        
+        <Link href="/cadastrar">
+          <button className="bg-indigo-500 hover:bg-indigo-400 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg transition">
+            Criar Conta
+          </button>
+        </Link>
       </section>
 
       <footer className="bg-slate-900 py-8 text-center text-slate-500 text-sm">

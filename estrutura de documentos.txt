@@ -1,0 +1,120 @@
+
+site/ia-api-fastapi
+├_pycache_/
+├ services/
+│   ├──_pycache_
+│   ├──busca_livre.py
+│   ├──ia_planilha.py
+│   ├──lead_generator.py
+│   ├──parametros_ia.py
+│   ├──utils.py
+├ db.py
+├ main.py
+├ models.py
+
+--------------------------------------------------------------------------------------------------------
+site/meu-site (raiz)
+├.next/
+├ node modules/
+├ prisma/
+│   ├── schema.prisma
+├ public/
+├ src/
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │       └── [...nextauth]/
+│   │ 					└── route.ts
+│   │   ├── ia/
+│   │   │   └── route.ts
+│   │   ├── perfil/
+│   │   │   └── route.ts
+│   │   ├── register/
+│   │   │   └── route.ts
+│   │   ├── upload/
+│   │       └── dados-enriquecidos
+│   │   │       └── route.ts
+│   │   │   └── route.ts
+│   ├── cadastrar/
+│   │   ├── page.tsx
+│   ├── dashboard/
+│   │   ├── busca_livre/
+│   │   │   └── page.tsx
+│   │   ├── crescimento_empresas/
+│   │   │   └── page.tsx
+│   │   ├── ia/
+│   │   │   └── page.tsx
+│   │   ├── mapa_oportunidades/
+│   │   │   └── page.tsx
+│   │   ├── perfil/
+│   │   │   └── page.tsx
+│   │   ├── upload/
+│   │   │   └── page.tsx
+│   │   ├── layourt.tsx
+│   ├── interna/
+│   │   │   └── layout.tsx
+│   │   │   └── page.tsx
+│   ├── login/
+│   │   │   └── page.tsx
+│   │   └── favicon 
+│   │   └── globals.css 
+│   │   └── layout.tsx 
+│   │   └── page.tsx  
+├── components/
+│   └── LoginForm.tsx
+│   └── SessionWrapper.tsx
+│   └── FileUpload.tsx
+│   └── TextAreaUpload.tsx
+│   └── ResultadoTabela.tsx
+│   └── ResumoGraficos.tsx
+│   └── Sidebar.tsx
+│   └── MapaLeads.tsx
+│   └── TextAreaUpload.tsx
+│   └── ui/
+│   │   └── badge.tsx
+│   │   └── buttom.tsx
+│   │   └── card.tsx
+│   │   └── input.tsx
+│   │   └── label.tsx
+│   │   └── separator.tsx
+│   │   └── slider.tsx
+│   │   └── table.tsx
+│   │   └── tabs.tsx
+│   │   └── textarea.tsx
+│   │   └── tooltip.tsx
+├── constants/
+│   └── sidebarRoutes.ts
+├── lib/
+│   └── auth.ts
+│   └── authOptions.ts
+│   └── constants.ts
+│   └── prisma.ts
+│   └── route.ts
+│   └── extractCNPJs.ts
+│   └── parseExcel.ts
+│   └── utils.ts
+│   └── types/
+│       └── index.ts
+│   └── read.txt
+├ types/
+│ └── cleave-react.d.ts
+│ └── react-plotly.js.d.ts
+│ └── plotly-js-dist-min.d.ts
+.env
+.env.local
+.gitignore
+COLUNAS BR.TXT
+components.json
+eslint.config.mjs
+estrutura de documentos.txt
+generate_hash.py
+next-env.d.ts
+next.config.js
+package-lock.json
+package.json
+postcss.config.js
+README.md
+tailwind.config.js
+test-prisma.ts
+tsconfig.json
+
